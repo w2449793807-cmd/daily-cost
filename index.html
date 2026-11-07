@@ -1,0 +1,1160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>日摊 · 每天固定要花多少</title>
+<meta name="description" content="用问答的方式梳理房租、会员、保险等固定支出，把每月固定成本摊到每一天。数据只保存在本机。" />
+<meta name="theme-color" content="#2f5f8a" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#101721" media="(prefers-color-scheme: dark)" />
+<meta name="format-detection" content="telephone=no" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%232f5f8a'/%3E%3Ctext x='32' y='42' font-size='30' font-family='serif' font-weight='700' fill='%23fffdf7' text-anchor='middle'%3E日%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --font-display: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+    --font-num: "SF Mono", "Cascadia Mono", "Roboto Mono", ui-monospace, monospace;
+
+    --fs-hero: clamp(38px, 6.4vw, 54px);
+    --fs-title: clamp(25px, 5.4vw, 34px);
+    --fs-body: 15px;
+    --fs-sub: 13px;
+    --fs-cap: 11px;
+
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px;
+    --r-card: 22px; --r-control: 12px; --r-pill: 999px;
+
+    --bg: #edf0f3;
+    --bg-grid: rgba(47, 73, 99, .045);
+    --paper: #fffdf8;
+    --paper-2: #f5f2eb;
+    --ink: #1b2837;
+    --ink-2: #47586b;
+    --muted: #697888;
+    --line: rgba(39, 61, 84, .12);
+    --line-strong: rgba(39, 61, 84, .24);
+    --accent: #2f5f8a;
+    --accent-2: #3f719f;
+    --accent-soft: #e0e9f2;
+    --accent-ink: #fffdf8;
+    --stamp: #b7603f;
+    --stamp-soft: #f3e5de;
+    --focus: rgba(47, 95, 138, .34);
+    --shadow: 0 22px 54px rgba(33, 49, 69, .13);
+    --shadow-soft: 0 7px 20px rgba(33, 49, 69, .08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101721;
+      --bg-grid: rgba(207, 224, 241, .04);
+      --paper: #1b2531;
+      --paper-2: #222d3a;
+      --ink: #eff3f8;
+      --ink-2: #c5d0dc;
+      --muted: #96a3b2;
+      --line: rgba(224, 235, 246, .12);
+      --line-strong: rgba(224, 235, 246, .23);
+      --accent: #8db9dc;
+      --accent-2: #a8cbea;
+      --accent-soft: rgba(141, 185, 220, .15);
+      --accent-ink: #0e1a24;
+      --stamp: #e2a17e;
+      --stamp-soft: rgba(226, 161, 126, .13);
+      --focus: rgba(141, 185, 220, .36);
+      --shadow: 0 24px 60px rgba(0, 0, 0, .34);
+      --shadow-soft: 0 8px 24px rgba(0, 0, 0, .22);
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
+  html { min-width: 320px; background: var(--bg); }
+  body {
+    margin: 0; min-height: 100vh; color: var(--ink);
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+    background-size: 100% 28px, 28px 100%;
+    font-family: var(--font-ui); font-size: var(--fs-body); line-height: 1.55;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    font-variant-numeric: tabular-nums;
+  }
+  button, input, select { font: inherit; }
+  button { color: inherit; }
+  button, select { cursor: pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid var(--focus); outline-offset: 2px;
+  }
+  input, select { min-height: 44px; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  }
+  .page { width: 100%; min-height: 100vh; }
+  .main { width: min(100%, 760px); margin: 0 auto; padding: 0 18px; }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    width: 100%; padding: 12px max(18px, calc((100vw - 724px) / 2));
+    background: var(--bg);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  }
+  .brand-btn {
+    display: inline-flex; align-items: center; gap: 9px; min-height: 44px;
+    padding: 0 4px; border: 0; background: transparent; border-radius: 9px;
+  }
+  .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--stamp); box-shadow: 0 0 0 4px var(--stamp-soft); }
+  .brand-word { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: .04em; }
+  .brand-caption { margin-left: 2px; color: var(--muted); font-size: var(--fs-cap); }
+  .live-ticket {
+    display: flex; align-items: baseline; gap: 8px;
+    min-height: 40px; padding: 7px 13px; border: 1px solid var(--line);
+    background: var(--paper); border-radius: var(--r-pill); box-shadow: var(--shadow-soft);
+  }
+  .live-ticket span { color: var(--muted); font-size: var(--fs-cap); white-space: nowrap; }
+  .live-ticket strong { font-family: var(--font-num); font-size: 16px; font-weight: 700; letter-spacing: -.03em; white-space: nowrap; }
+  .live-ticket em { color: var(--muted); font-size: var(--fs-cap); font-style: normal; }
+  .live-ticket.tick strong { animation: tick .32s ease; }
+  @keyframes tick { 0% { transform: translateY(2px); opacity: .45; } 100% { transform: none; opacity: 1; } }
+
+  .screen { min-height: calc(100vh - 69px); animation: screenIn .3s cubic-bezier(.2,.75,.2,1); }
+  @keyframes screenIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* 首屏 */
+  .intro-shell { min-height: calc(100vh - 32px); display: flex; flex-direction: column; justify-content: center; padding: 30px 0 26px; }
+  .intro-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: clamp(32px, 7vh, 72px); }
+  .intro-brand { display: flex; align-items: baseline; gap: 10px; }
+  .intro-brand strong { font-family: var(--font-display); font-size: 26px; letter-spacing: .06em; }
+  .intro-brand span { color: var(--muted); font-size: var(--fs-sub); }
+  .local-badge { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: var(--fs-sub); }
+  .local-badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .intro-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(260px, .92fr); gap: clamp(28px, 7vw, 72px); align-items: center; }
+  .intro-copy { max-width: 470px; }
+  .intro-kicker { margin: 0 0 15px; color: var(--accent); font-size: var(--fs-sub); font-weight: 650; }
+  .intro-copy h1 { margin: 0; font-family: var(--font-display); font-size: var(--fs-hero); line-height: 1.14; letter-spacing: -.035em; font-weight: 700; }
+  .intro-copy h1 span { display: block; white-space: nowrap; }
+  .intro-lead { margin: 22px 0 0; max-width: 28em; color: var(--ink-2); font-size: 17px; line-height: 1.75; }
+  .intro-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .intro-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 19px 0 0; color: var(--muted); font-size: var(--fs-sub); }
+  .intro-meta span { display: inline-flex; align-items: center; gap: 7px; }
+  .intro-meta span::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--line-strong); }
+  .scope-note { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .scope-note span { padding: 6px 10px; color: var(--muted); font-size: var(--fs-cap); border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--paper); background: color-mix(in srgb, var(--paper) 50%, transparent); }
+  .scope-note span::before { content: "×"; margin-right: 5px; color: var(--stamp); font-weight: 700; }
+
+  .receipt-preview {
+    position: relative; width: min(100%, 310px); margin: 0 auto; padding: 24px 22px 26px;
+    background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow);
+    transform: rotate(2.2deg); border-radius: 4px;
+  }
+  .receipt-preview::before, .receipt-preview::after {
+    content: ""; position: absolute; left: -1px; right: -1px; height: 10px;
+    background-size: 16px 16px; background-repeat: repeat-x;
+  }
+  .receipt-preview::before { top: -6px; background-image: radial-gradient(circle at 8px 8px, transparent 7px, var(--paper) 7.5px); }
+  .receipt-preview::after { bottom: -6px; transform: rotate(180deg); background-image: radial-gradient(circle at 8px 8px, transparent 7px, var(--paper) 7.5px); }
+  .rp-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 13px; border-bottom: 1px dashed var(--line-strong); color: var(--muted); font-size: var(--fs-cap); }
+  .rp-top strong { color: var(--ink); font-family: var(--font-display); font-size: 16px; letter-spacing: .08em; }
+  .rp-label { margin: 24px 0 4px; color: var(--muted); font-size: var(--fs-sub); }
+  .rp-amount { display: flex; align-items: baseline; gap: 4px; font-family: var(--font-num); font-weight: 700; letter-spacing: -.04em; }
+  .rp-amount small { font-size: 17px; font-weight: 500; }
+  .rp-amount b { font-size: 43px; line-height: 1; }
+  .rp-amount em { color: var(--muted); font-family: var(--font-ui); font-size: var(--fs-sub); font-style: normal; font-weight: 400; letter-spacing: 0; }
+  .rp-lines { display: grid; gap: 10px; margin-top: 25px; }
+  .rp-line { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--ink-2); font-size: var(--fs-sub); }
+  .rp-line i { flex: 1; border-bottom: 1px dotted var(--line-strong); height: 1px; }
+  .rp-line b { min-width: 34px; color: var(--stamp); font-family: var(--font-num); font-size: var(--fs-sub); text-align: right; opacity: .62; }
+  .rp-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: 28px; padding-top: 18px; border-top: 1px dashed var(--line-strong); }
+  .rp-note { max-width: 120px; color: var(--muted); font-size: 10px; line-height: 1.7; }
+  .stamp {
+    display: grid; place-items: center; width: 68px; height: 68px; flex: none;
+    border: 2px solid var(--stamp); border-radius: 50%; color: var(--stamp);
+    font-family: var(--font-display); font-size: 12px; font-weight: 700; line-height: 1.25;
+    text-align: center; transform: rotate(-10deg); opacity: .76;
+  }
+  .intro-foot { display: flex; justify-content: space-between; gap: 18px; margin-top: clamp(40px, 8vh, 82px); padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: var(--fs-cap); line-height: 1.7; }
+  .intro-foot p { margin: 0; }
+
+  /* 通用按钮 */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 48px; padding: 0 20px; border-radius: var(--r-control);
+    border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink);
+    font-weight: 650; text-decoration: none; transition: transform .13s ease, background .13s ease, border-color .13s ease;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 24%, transparent); }
+  .btn-primary:hover { background: var(--accent-2); border-color: var(--accent-2); }
+  .btn-text { min-height: 44px; padding: 0 8px; border: 0; background: transparent; color: var(--accent); font-weight: 650; }
+  .btn-danger { color: var(--stamp); }
+  .btn-wide { width: 100%; }
+  .btn-lg { min-height: 54px; padding: 0 24px; font-size: 16px; }
+  .btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+  /* 问答 */
+  .wizard-shell { max-width: 680px; margin: 0 auto; padding: 26px 0 44px; }
+  .progress-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 2px 12px; color: var(--muted); font-size: var(--fs-sub); }
+  .progress-top strong { color: var(--accent); font-weight: 650; }
+  .progress-track { height: 4px; margin: 0 2px 18px; overflow: hidden; background: var(--line); border-radius: var(--r-pill); }
+  .progress-fill { width: 0; height: 100%; border-radius: inherit; background: var(--accent); transition: width .32s cubic-bezier(.2,.75,.2,1); }
+  .question-card {
+    position: relative; padding: clamp(24px, 5vw, 38px); background: var(--paper);
+    border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow-soft);
+  }
+  .question-card::before { content: ""; position: absolute; inset: 0 auto auto 0; width: 82px; height: 4px; border-radius: var(--r-card) 0 4px 0; background: var(--stamp); opacity: .75; }
+  .question-head { max-width: 560px; }
+  .question-kicker { margin: 0 0 10px; color: var(--accent); font-size: var(--fs-sub); font-weight: 650; }
+  .question-head h1 { margin: 0; font-family: var(--font-display); font-size: var(--fs-title); line-height: 1.28; letter-spacing: -.025em; }
+  .question-desc { margin: 13px 0 0; max-width: 38em; color: var(--muted); font-size: 14px; line-height: 1.75; }
+  .step-body { margin-top: 28px; }
+  .form-section + .form-section { margin-top: 32px; padding-top: 26px; border-top: 1px solid var(--line); }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  .section-head h2 { margin: 0; font-size: var(--fs-body); font-weight: 700; }
+  .section-head span { color: var(--muted); font-size: var(--fs-cap); }
+  .ledger-list { border-top: 1px solid var(--line); }
+  .ledger-row { padding: 15px 0 14px; border-bottom: 1px dashed var(--line-strong); }
+  .row-title { display: flex; align-items: center; gap: 9px; }
+  .item-name {
+    flex: 1; width: 100%; min-width: 0; min-height: 44px; padding: 2px 0;
+    color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid transparent;
+    font-weight: 650; border-radius: 0;
+  }
+  .item-name::placeholder { color: var(--muted); font-weight: 500; }
+  .item-name:focus { border-bottom-color: var(--accent); }
+  .icon-btn {
+    display: grid; place-items: center; width: 44px; height: 44px; flex: none;
+    border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-size: 20px; line-height: 1;
+  }
+  .icon-btn:hover { color: var(--stamp); background: var(--stamp-soft); }
+  .row-controls { display: grid; grid-template-columns: minmax(118px, 1fr) 76px minmax(74px, auto); gap: 9px; align-items: center; margin-top: 7px; padding-left: 1px; }
+  .money-input { display: flex; align-items: center; gap: 5px; min-width: 0; min-height: 44px; padding: 0 10px; background: var(--paper-2); border: 1px solid transparent; border-radius: 10px; transition: border-color .14s ease, background .14s ease; }
+  .money-input:focus-within { border-color: var(--accent); background: var(--paper); }
+  .money-input span { color: var(--muted); font-family: var(--font-num); font-size: var(--fs-sub); }
+  .money-input input { width: 100%; min-width: 0; min-height: 40px; padding: 0; border: 0; background: transparent; color: var(--ink); font-family: var(--font-num); font-size: 17px; font-weight: 650; }
+  .money-input input:focus { outline: 0; }
+  .cycle-select {
+    width: 100%; min-height: 44px; padding: 0 28px 0 10px;
+    border: 1px solid var(--line); border-radius: 10px; background-color: var(--paper-2); color: var(--ink-2);
+    font-size: var(--fs-sub); appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position: calc(100% - 14px) 19px, calc(100% - 10px) 19px;
+    background-size: 4px 4px, 4px 4px; background-repeat: no-repeat;
+  }
+  .row-eq { color: var(--muted); font-size: var(--fs-cap); text-align: right; white-space: nowrap; }
+  .quick-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 13px; }
+  .quick-chip {
+    min-height: 44px; padding: 0 13px; border: 1px solid var(--line); border-radius: var(--r-pill);
+    background: var(--paper-2);
+    background: color-mix(in srgb, var(--paper-2) 76%, transparent); color: var(--ink-2); font-size: var(--fs-cap);
+  }
+  .quick-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .add-line { min-height: 44px; margin-top: 5px; padding: 0 3px; border: 0; background: transparent; color: var(--accent); font-size: var(--fs-sub); font-weight: 650; }
+  .section-empty { padding: 15px 0 4px; color: var(--muted); font-size: var(--fs-sub); }
+  .empty-state-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 0; color: var(--muted); font-size: var(--fs-sub); border-bottom: 1px dashed var(--line-strong); }
+  .empty-state-row span { max-width: 26em; }
+  .skip-wrap { display: flex; justify-content: flex-end; margin-top: 25px; padding-top: 5px; }
+  .skip-btn { min-height: 44px; padding: 0 2px; border: 0; background: transparent; color: var(--muted); font-size: var(--fs-sub); text-decoration: underline; text-underline-offset: 4px; }
+  .wizard-nav {
+    position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 10;
+    display: grid; grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr); gap: 10px;
+    margin-top: 16px; padding: 10px; border: 1px solid var(--line); border-radius: 16px;
+    background: var(--paper);
+    background: color-mix(in srgb, var(--paper) 93%, transparent); box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  }
+  .wizard-nav .btn { width: 100%; }
+
+  /* 核对 */
+  .review-shell { max-width: 680px; margin: 0 auto; padding: 28px 0 48px; }
+  .review-head h1, .result-heading h1 { margin: 0; font-family: var(--font-display); font-size: var(--fs-title); line-height: 1.3; letter-spacing: -.025em; }
+  .review-head p { margin: 10px 0 0; color: var(--muted); font-size: var(--fs-sub); line-height: 1.7; }
+  .review-total {
+    display: grid; grid-template-columns: 1.4fr repeat(2, 1fr); gap: 1px; margin: 25px 0 20px;
+    overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--line);
+  }
+  .rt-cell { padding: 16px; background: var(--paper); }
+  .rt-cell span { display: block; color: var(--muted); font-size: var(--fs-cap); }
+  .rt-cell strong { display: block; margin-top: 5px; font-family: var(--font-num); font-size: 19px; letter-spacing: -.03em; }
+  .rt-cell:first-child strong { color: var(--accent); font-size: 25px; }
+  .review-list { display: grid; gap: 10px; }
+  .review-block { padding: 17px 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 15px; }
+  .review-block-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .review-block h2 { margin: 0; font-size: var(--fs-body); font-weight: 700; }
+  .review-block-head p { margin: 3px 0 0; color: var(--muted); font-size: var(--fs-cap); }
+  .review-edit { min-height: 44px; padding: 0 8px; border: 0; background: transparent; color: var(--accent); font-size: var(--fs-sub); font-weight: 650; }
+  .review-items { display: grid; gap: 8px; margin-top: 13px; padding-top: 12px; border-top: 1px dashed var(--line-strong); }
+  .review-item { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; color: var(--ink-2); font-size: var(--fs-sub); }
+  .review-item > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .review-item small { margin-left: 7px; color: var(--muted); }
+  .review-item b { flex: none; font-family: var(--font-num); font-size: var(--fs-sub); font-weight: 600; }
+  .review-none { margin-top: 12px; color: var(--muted); font-size: var(--fs-sub); }
+  .review-actions { display: grid; grid-template-columns: .75fr 1.25fr; gap: 10px; margin-top: 18px; }
+
+  /* 结果票据 */
+  .result-shell { max-width: 620px; margin: 0 auto; padding: 29px 0 52px; }
+  .result-heading { margin-bottom: 20px; }
+  .result-heading p { margin: 9px 0 0; color: var(--muted); font-size: var(--fs-sub); }
+  .receipt {
+    position: relative; padding: clamp(25px, 6vw, 42px); overflow: hidden;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow);
+  }
+  .receipt::before, .receipt::after {
+    content: ""; position: absolute; left: -1px; right: -1px; height: 12px;
+    background-size: 18px 18px; background-repeat: repeat-x;
+  }
+  .receipt::before { top: -6px; background-image: radial-gradient(circle at 9px 9px, transparent 8px, var(--paper) 8.5px); }
+  .receipt::after { bottom: -6px; transform: rotate(180deg); background-image: radial-gradient(circle at 9px 9px, transparent 8px, var(--paper) 8.5px); }
+  .receipt-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--muted); font-size: var(--fs-cap); }
+  .receipt-brand { color: var(--ink); font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: .08em; }
+  .receipt-label { margin: 30px 0 5px; color: var(--muted); font-size: var(--fs-sub); }
+  .daily-amount { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px; font-family: var(--font-num); }
+  .daily-amount .cur { padding-bottom: 8px; color: var(--stamp); font-size: 24px; font-weight: 600; }
+  .daily-amount strong { font-size: clamp(52px, 12vw, 78px); line-height: .98; letter-spacing: -.07em; }
+  .daily-amount small { color: var(--muted); font-family: var(--font-ui); font-size: 15px; font-weight: 500; letter-spacing: 0; }
+  .daily-caption { margin: 10px 0 0; color: var(--muted); font-size: var(--fs-sub); }
+  .receipt-rule { height: 1px; margin: 27px 0 20px; border: 0; border-top: 1px dashed var(--line-strong); }
+  .receipt-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .summary-cell span { display: block; color: var(--muted); font-size: var(--fs-cap); }
+  .summary-cell strong { display: block; margin-top: 3px; font-family: var(--font-num); font-size: 17px; letter-spacing: -.025em; }
+  .breakdown-title { margin: 28px 0 13px; color: var(--muted); font-size: var(--fs-sub); font-weight: 600; }
+  .breakdown { display: grid; gap: 13px; }
+  .cat-row { display: grid; gap: 6px; }
+  .cat-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: var(--fs-sub); }
+  .cat-name { display: inline-flex; align-items: center; gap: 8px; }
+  .cat-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .cat-line strong { font-family: var(--font-num); font-size: var(--fs-sub); font-weight: 650; }
+  .cat-line em { margin-left: 5px; color: var(--muted); font-size: var(--fs-cap); font-style: normal; }
+  .cat-bar { height: 3px; overflow: hidden; border-radius: var(--r-pill); background: var(--line); }
+  .cat-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+  .receipt-note { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-top: 28px; padding-top: 18px; border-top: 1px dashed var(--line-strong); }
+  .receipt-note p { max-width: 340px; margin: 0; color: var(--muted); font-size: var(--fs-cap); line-height: 1.7; }
+  .receipt-note .stamp { width: 62px; height: 62px; font-size: 11px; }
+  .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .result-actions .btn-primary { grid-column: 1 / -1; }
+  .result-foot { display: flex; justify-content: center; margin-top: 17px; }
+  .scope-footnote { margin: 22px auto 0; max-width: 520px; color: var(--muted); font-size: var(--fs-cap); line-height: 1.7; text-align: center; }
+  .empty-result { padding: 30px 0 8px; text-align: center; }
+  .empty-result h2 { margin: 0; font-family: var(--font-display); font-size: 24px; }
+  .empty-result p { margin: 9px auto 20px; max-width: 30em; color: var(--muted); font-size: var(--fs-sub); line-height: 1.7; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 100;
+    max-width: calc(100vw - 32px); padding: 11px 16px; transform: translate(-50%, 16px);
+    border-radius: var(--r-pill); background: var(--ink); color: var(--paper);
+    box-shadow: 0 10px 30px rgba(0,0,0,.18); font-size: var(--fs-sub); line-height: 1.5;
+    opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 640px) {
+    .main { padding: 0 14px; }
+    .topbar { padding: 10px 14px; }
+    .brand-caption { display: none; }
+    .live-ticket { padding: 6px 10px; gap: 6px; }
+    .live-ticket span { font-size: 10px; }
+    .live-ticket strong { font-size: 15px; }
+    .intro-shell { min-height: calc(100vh - 20px); padding-top: 20px; }
+    .intro-top { margin-bottom: 34px; }
+    .intro-grid { grid-template-columns: 1fr; gap: 36px; }
+    .intro-copy { max-width: none; }
+    .intro-lead { margin-top: 18px; font-size: 16px; }
+    .intro-actions { display: grid; grid-template-columns: 1fr; margin-top: 26px; }
+    .intro-actions .btn { width: 100%; }
+    .intro-actions .btn-text { justify-self: start; width: auto; }
+    .receipt-preview { width: min(87vw, 310px); margin-top: 2px; }
+    .intro-foot { flex-direction: column; gap: 4px; margin-top: 38px; }
+    .wizard-shell { padding-top: 19px; }
+    .question-card { padding: 23px 18px 25px; border-radius: 18px; }
+    .question-head h1 { font-size: 26px; }
+    .row-controls { grid-template-columns: minmax(108px, 1fr) 72px; }
+    .row-eq { grid-column: 1 / -1; padding-right: 2px; text-align: right; }
+    .wizard-nav { grid-template-columns: .65fr 1.35fr; }
+    .review-shell, .result-shell { padding-top: 20px; }
+    .review-total { grid-template-columns: 1.25fr 1fr 1fr; }
+    .rt-cell { padding: 13px 11px; }
+    .rt-cell strong { font-size: 16px; }
+    .rt-cell:first-child strong { font-size: 21px; }
+    .review-actions, .result-actions { grid-template-columns: 1fr 1fr; }
+    .result-actions .btn-primary { grid-column: 1 / -1; }
+    .receipt { padding: 27px 20px 32px; }
+    .receipt-label { margin-top: 23px; }
+    .receipt-summary { gap: 10px; }
+    .receipt-note p { max-width: 220px; }
+  }
+  @media (max-width: 380px) {
+    .live-ticket span { display: none; }
+    .question-card { padding-left: 15px; padding-right: 15px; }
+    .row-controls { gap: 7px; }
+    .review-total { grid-template-columns: 1fr 1fr; }
+    .rt-cell:first-child { grid-column: 1 / -1; }
+    .review-actions, .result-actions { grid-template-columns: 1fr; }
+    .result-actions .btn-primary { grid-column: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar" id="topbar" hidden>
+      <button type="button" class="brand-btn" id="brandHome" aria-label="返回首页">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span class="brand-word">日摊</span>
+        <span class="brand-caption">固定开支</span>
+      </button>
+      <div class="live-ticket" id="liveTicket">
+        <span>当前日均</span>
+        <strong id="liveDay">¥0.00</strong>
+        <em>/天</em>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="screen intro" id="introScreen" aria-labelledby="introTitle">
+        <div class="intro-shell">
+          <div class="intro-top">
+            <div class="intro-brand"><strong>日摊</strong><span>固定开支问答</span></div>
+            <div class="local-badge"><i aria-hidden="true"></i>只在本机计算</div>
+          </div>
+
+          <div class="intro-grid">
+            <div class="intro-copy">
+              <p class="intro-kicker">把跑不掉的钱，摊到每一天</p>
+              <h1 id="introTitle" tabindex="-1"><span>每天睁眼，</span><span>已经花掉多少？</span></h1>
+              <p class="intro-lead">用几组简单问题，把房租、会员、保险这些固定支出梳理出来。不追踪流水，只确认你每天必须准备好的那笔钱。</p>
+              <div class="intro-actions">
+                <button type="button" class="btn btn-primary btn-lg" id="startBtn">开始梳理</button>
+                <button type="button" class="btn btn-text" id="restartIntro" hidden>重新开始</button>
+              </div>
+              <p class="intro-meta"><span>6 组问题</span><span>约 3 分钟</span><span>自动保存</span></p>
+              <p class="intro-meta" id="savedNote" hidden></p>
+              <div class="scope-note" aria-label="不计入的项目">
+                <span>吃饭</span><span>通勤</span><span>临时消费</span>
+              </div>
+            </div>
+
+            <div class="receipt-preview" aria-hidden="true">
+              <div class="rp-top"><strong>日摊</strong><span>结果预览</span></div>
+              <p class="rp-label">你的固定生活成本</p>
+              <div class="rp-amount"><small>¥</small><b>?</b><em>/ 天</em></div>
+              <div class="rp-lines">
+                <div class="rp-line"><span>住处</span><i></i><b>01</b></div>
+                <div class="rp-line"><span>账单</span><i></i><b>02</b></div>
+                <div class="rp-line"><span>会员</span><i></i><b>03</b></div>
+                <div class="rp-line"><span>保障</span><i></i><b>04</b></div>
+              </div>
+              <div class="rp-foot">
+                <p class="rp-note">把每月固定项统一折算，得到全年平均的每日成本。</p>
+                <div class="stamp">固定<br />开支</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="intro-foot">
+            <p>只会保存在当前浏览器的本地存储里，不会上传。</p>
+            <p>只为看清固定成本，不作为记账或理财建议。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen wizard" id="wizardScreen" aria-labelledby="questionTitle" hidden>
+        <div class="wizard-shell">
+          <div class="progress-top"><strong id="stepLabel">第 1 / 6 组</strong><span id="stepName">住处</span></div>
+          <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+
+          <div class="question-card">
+            <div class="question-head">
+              <p class="question-kicker" id="questionKicker">住处</p>
+              <h1 id="questionTitle" tabindex="-1">先说说，你为住处固定付多少？</h1>
+              <p class="question-desc" id="questionDesc"></p>
+            </div>
+            <div class="step-body" id="stepBody"></div>
+            <div class="skip-wrap"><button type="button" class="skip-btn" id="skipBtn">这一页都没有</button></div>
+          </div>
+
+          <nav class="wizard-nav" aria-label="问答步骤">
+            <button type="button" class="btn" id="backBtn">上一步</button>
+            <button type="button" class="btn btn-primary" id="nextBtn">继续</button>
+          </nav>
+        </div>
+      </section>
+
+      <section class="screen review" id="reviewScreen" aria-labelledby="reviewTitle" hidden>
+        <div class="review-shell">
+          <div class="review-head">
+            <h1 id="reviewTitle" tabindex="-1">最后核对一下</h1>
+            <p>周期不同也没关系，下面已经统一折算成每月金额。点任意一组可以返回修改。</p>
+          </div>
+          <div class="review-total" id="reviewTotal"></div>
+          <div class="review-list" id="reviewList"></div>
+          <div class="review-actions">
+            <button type="button" class="btn" id="reviewBackBtn">返回修改</button>
+            <button type="button" class="btn btn-primary" id="makeResultBtn">生成日均账单</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen result" id="resultScreen" aria-labelledby="resultTitle" hidden>
+        <div class="result-shell" id="resultShell"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'ri-tan-fixed-cost-v1';
+  var DAYS_PER_YEAR = 365;
+  var CYCLE_FACTOR = { month: 1, quarter: 1 / 3, year: 1 / 12 };
+  var CYCLE_LABEL = { month: '每月', quarter: '每季', year: '每年' };
+  var CYCLE_SHORT = { month: '月', quarter: '季', year: '年' };
+
+  var STEPS = [
+    {
+      id: 'home',
+      name: '住处',
+      kicker: '住处',
+      title: '先说说，你为住处固定付多少？',
+      description: '房租通常是大头。只填每月都会发生的固定项，不含按用量浮动的水电。按年或按季付就切换周期。',
+      sections: [{
+        id: 'housing',
+        title: '居住固定项',
+        note: '没有就留空',
+        addLabel: '添加居住费用',
+        defaults: ['房租 / 房贷月供', '物业费', '车位 / 固定停车', '其他居住固定费用'],
+        quick: []
+      }]
+    },
+    {
+      id: 'bills',
+      name: '账单',
+      kicker: '基础账单',
+      title: '每月账单，大概是多少？',
+      description: '水电网会浮动，填最近几个月的平均数就好。宽带如果只承担一部分，也填你实际支付的那部分。',
+      sections: [{
+        id: 'utilities',
+        title: '水电与通信',
+        note: '填实际承担金额',
+        addLabel: '添加账单',
+        defaults: ['水费', '电费', '燃气费', '宽带', '手机话费'],
+        quick: []
+      }]
+    },
+    {
+      id: 'subscriptions',
+      name: '会员',
+      kicker: '会员与订阅',
+      title: '有哪些固定续费，或者一次买一年的会员？',
+      description: '合订包写成一项就好，比如「B站 + 酷狗」。到期才续、但每年都会发生的，也按年填入。',
+      sections: [{
+        id: 'subscriptions',
+        title: '会员与订阅',
+        note: '合订包写一项',
+        addLabel: '添加自定义订阅',
+        defaults: [],
+        quick: [
+          { name: '视频会员', cycle: 'month' },
+          { name: '音乐会员', cycle: 'month' },
+          { name: '软件 / 云服务', cycle: 'month' },
+          { name: '云盘', cycle: 'year' }
+        ]
+      }]
+    },
+    {
+      id: 'protection',
+      name: '保障',
+      kicker: '保障与还款',
+      title: '有没有固定保险，或每月必须还的钱？',
+      description: '医疗险、重疾险、固定分期和贷款月供，都会占住每月现金流。日常刷卡的浮动消费不填。',
+      sections: [
+        {
+          id: 'insurance', title: '保险', note: '按实际缴费周期', addLabel: '添加保险',
+          defaults: [], quick: [{ name: '医疗险', cycle: 'month' }, { name: '重疾险', cycle: 'year' }, { name: '寿险', cycle: 'year' }, { name: '意外险', cycle: 'year' }]
+        },
+        {
+          id: 'debt', title: '固定还款', note: '只填固定分期', addLabel: '添加还款',
+          defaults: [], quick: [{ name: '花呗分期', cycle: 'month' }, { name: '信用卡分期', cycle: 'month' }, { name: '消费贷', cycle: 'month' }]
+        }
+      ]
+    },
+    {
+      id: 'care',
+      name: '健康与宠物',
+      kicker: '健康与宠物',
+      title: '身体和宠物，有没有固定要花的钱？',
+      description: '健身卡、固定药费、猫粮猫砂都算。按实际缴费周期填，不需要估算临时看病的钱。',
+      sections: [
+        {
+          id: 'health', title: '健康与运动', note: '固定才填', addLabel: '添加健康支出',
+          defaults: [], quick: [{ name: '健身卡', cycle: 'month' }, { name: '固定药费', cycle: 'month' }, { name: '心理咨询', cycle: 'month' }]
+        },
+        {
+          id: 'pets', title: '宠物', note: '按每月用量估算', addLabel: '添加宠物支出',
+          defaults: [], quick: [{ name: '猫粮', cycle: 'month' }, { name: '猫砂', cycle: 'month' }, { name: '宠物保险', cycle: 'year' }]
+        }
+      ]
+    },
+    {
+      id: 'extras',
+      name: '工作与其他',
+      kicker: '工作、家人与其他',
+      title: '最后，还有哪些固定项？',
+      description: '工作学习工具、家庭支持、年费、捐赠或其他合同支出。没有的组直接留空。',
+      sections: [
+        {
+          id: 'work', title: '工作与学习', note: '只看固定项', addLabel: '添加工作支出',
+          defaults: [], quick: [{ name: '域名', cycle: 'year' }, { name: '软件订阅', cycle: 'month' }, { name: '云服务', cycle: 'month' }, { name: '课程分期', cycle: 'month' }]
+        },
+        {
+          id: 'family', title: '家人', note: '固定支持才填', addLabel: '添加家庭支出',
+          defaults: [], quick: [{ name: '生活费', cycle: 'month' }, { name: '赡养费', cycle: 'month' }]
+        },
+        {
+          id: 'other', title: '其他固定项', note: '年费、捐赠等', addLabel: '添加其他支出',
+          defaults: [], quick: [{ name: '协会年费', cycle: 'year' }, { name: '固定捐赠', cycle: 'month' }]
+        }
+      ]
+    }
+  ];
+
+  var SECTION_TO_STEP = {};
+  STEPS.forEach(function (step) {
+    step.sections.forEach(function (section) { SECTION_TO_STEP[section.id] = step.id; });
+  });
+
+  var state = loadState();
+  var toastTimer = null;
+
+  function uid() {
+    return 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function makeItem(sectionId, name, cycle) {
+    return { id: uid(), sectionId: sectionId, name: name || '', amount: '', cycle: cycle || 'month' };
+  }
+
+  function freshItems() {
+    var items = [];
+    STEPS.forEach(function (step) {
+      step.sections.forEach(function (section) {
+        (section.defaults || []).forEach(function (name) {
+          items.push(makeItem(section.id, name, 'month'));
+        });
+      });
+    });
+    return items;
+  }
+
+  function freshState() {
+    return { version: 1, step: 0, items: freshItems(), updatedAt: 0 };
+  }
+
+  function loadState() {
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return freshState();
+      var parsed = JSON.parse(raw);
+      if (!parsed || parsed.version !== 1 || !Array.isArray(parsed.items)) return freshState();
+      return {
+        version: 1,
+        step: Math.max(0, Math.min(STEPS.length - 1, Number(parsed.step) || 0)),
+        items: parsed.items.map(function (item) {
+          return {
+            id: String(item.id || uid()),
+            sectionId: String(item.sectionId || ''),
+            name: String(item.name || ''),
+            amount: item.amount === null || typeof item.amount === 'undefined' ? '' : String(item.amount),
+            cycle: CYCLE_FACTOR[item.cycle] ? item.cycle : 'month'
+          };
+        }),
+        updatedAt: Number(parsed.updatedAt) || 0
+      };
+    } catch (error) {
+      return freshState();
+    }
+  }
+
+  function saveState() {
+    try {
+      state.updatedAt = Date.now();
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        version: state.version,
+        step: state.step,
+        items: state.items,
+        updatedAt: state.updatedAt
+      }));
+    } catch (error) { /* 本地存储不可用时仍允许本次使用 */ }
+  }
+
+  function amountOf(item) {
+    var value = Number(item.amount);
+    return Number.isFinite(value) && value > 0 ? value : 0;
+  }
+
+  function monthlyOf(item) {
+    return amountOf(item) * (CYCLE_FACTOR[item.cycle] || 1);
+  }
+
+  function dailyOf(item) {
+    return monthlyOf(item) * 12 / DAYS_PER_YEAR;
+  }
+
+  function money(value, digits) {
+    var places = typeof digits === 'number' ? digits : 2;
+    return Number(value || 0).toLocaleString('zh-CN', {
+      minimumFractionDigits: places,
+      maximumFractionDigits: places
+    });
+  }
+
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+    });
+  }
+
+  function itemsOfStep(step) {
+    var sectionIds = step.sections.map(function (section) { return section.id; });
+    return state.items.filter(function (item) { return sectionIds.indexOf(item.sectionId) !== -1; });
+  }
+
+  function stepMonthly(step) {
+    return itemsOfStep(step).reduce(function (sum, item) { return sum + monthlyOf(item); }, 0);
+  }
+
+  function totals() {
+    var monthly = state.items.reduce(function (sum, item) { return sum + monthlyOf(item); }, 0);
+    return { monthly: monthly, yearly: monthly * 12, daily: monthly * 12 / DAYS_PER_YEAR };
+  }
+
+  function hasValues() {
+    return state.items.some(function (item) { return monthlyOf(item) > 0; });
+  }
+
+  function hasSavedProgress() {
+    return hasValues() || state.step > 0;
+  }
+
+  function toast(message) {
+    var el = document.getElementById('toast');
+    el.textContent = message;
+    el.classList.add('show');
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(function () { el.classList.remove('show'); }, 2400);
+  }
+
+  function setScreen(name) {
+    ['intro', 'wizard', 'review', 'result'].forEach(function (key) {
+      document.getElementById(key + 'Screen').hidden = key !== name;
+    });
+    document.getElementById('topbar').hidden = name === 'intro';
+    if (name === 'intro') refreshIntro();
+    if (name === 'wizard') renderStep();
+    if (name === 'review') renderReview();
+    if (name === 'result') renderResult();
+    updateLive();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+
+  function refreshIntro() {
+    var startBtn = document.getElementById('startBtn');
+    var restart = document.getElementById('restartIntro');
+    var savedNote = document.getElementById('savedNote');
+    if (hasSavedProgress()) {
+      startBtn.textContent = '继续上次';
+      restart.hidden = false;
+      savedNote.hidden = false;
+      savedNote.textContent = '上次停在：' + STEPS[state.step].name;
+    } else {
+      startBtn.textContent = '开始梳理';
+      restart.hidden = true;
+      savedNote.hidden = true;
+    }
+  }
+
+  function updateLive() {
+    var value = totals().daily;
+    var live = document.getElementById('liveDay');
+    live.textContent = '¥' + money(value, 2);
+    var ticket = document.getElementById('liveTicket');
+    ticket.classList.remove('tick');
+    void ticket.offsetWidth;
+    ticket.classList.add('tick');
+  }
+
+  function cycleOptions(selected) {
+    return ['month', 'quarter', 'year'].map(function (cycle) {
+      return '<option value="' + cycle + '"' + (cycle === selected ? ' selected' : '') + '>' + CYCLE_LABEL[cycle] + '</option>';
+    }).join('');
+  }
+
+  function renderItem(item) {
+    var monthly = monthlyOf(item);
+    var digits = item.amount === '' ? '未填写' : '约 ¥' + money(monthly, 2) + '/月';
+    return '' +
+      '<div class="ledger-row" data-item="' + esc(item.id) + '">' +
+        '<div class="row-title">' +
+          '<input class="item-name" data-field="name" value="' + esc(item.name) + '" placeholder="项目名称" aria-label="项目名称" autocomplete="off" />' +
+          '<button type="button" class="icon-btn" data-remove="' + esc(item.id) + '" aria-label="删除' + esc(item.name || '这一项') + '">×</button>' +
+        '</div>' +
+        '<div class="row-controls">' +
+          '<label class="money-input"><span>¥</span><input type="number" min="0" step="0.01" inputmode="decimal" data-field="amount" value="' + esc(item.amount) + '" placeholder="0" aria-label="' + esc(item.name || '固定支出') + '金额" /></label>' +
+          '<label><span class="sr-only">缴费周期</span><select class="cycle-select" data-field="cycle" aria-label="' + esc(item.name || '固定支出') + '缴费周期">' + cycleOptions(item.cycle) + '</select></label>' +
+          '<span class="row-eq" data-eq>' + digits + '</span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderSection(section) {
+    var items = state.items.filter(function (item) { return item.sectionId === section.id; });
+    var list = items.length ? items.map(renderItem).join('') : '<div class="empty-state-row"><span>还没有添加项目</span><button type="button" class="btn-text" data-add-section="' + section.id + '">添加一项</button></div>';
+    var quick = (section.quick || []).map(function (option) {
+      return '<button type="button" class="quick-chip" data-quick-section="' + section.id + '" data-quick-name="' + esc(option.name) + '" data-quick-cycle="' + option.cycle + '">+ ' + esc(option.name) + '</button>';
+    }).join('');
+    return '' +
+      '<section class="form-section" data-section="' + section.id + '">' +
+        '<div class="section-head"><h2>' + esc(section.title) + '</h2><span>' + esc(section.note || '') + '</span></div>' +
+        '<div class="ledger-list">' + list + '</div>' +
+        (quick ? '<div class="quick-row">' + quick + '</div>' : '') +
+        (items.length ? '<button type="button" class="add-line" data-add-section="' + section.id + '">+ ' + esc(section.addLabel) + '</button>' : '') +
+      '</section>';
+  }
+
+  function renderStep() {
+    var step = STEPS[state.step];
+    document.getElementById('stepLabel').textContent = '第 ' + (state.step + 1) + ' / ' + STEPS.length + ' 组';
+    document.getElementById('stepName').textContent = step.name;
+    document.getElementById('questionKicker').textContent = step.kicker;
+    document.getElementById('questionTitle').textContent = step.title;
+    document.getElementById('questionDesc').textContent = step.description;
+    document.getElementById('progressFill').style.width = (((state.step + 1) / STEPS.length) * 100) + '%';
+    document.getElementById('stepBody').innerHTML = step.sections.map(renderSection).join('');
+    document.getElementById('backBtn').textContent = state.step === 0 ? '返回首页' : '上一步';
+    document.getElementById('nextBtn').textContent = state.step === STEPS.length - 1 ? '核对明细' : '继续';
+    updateLive();
+  }
+
+  function addItem(sectionId, name, cycle, focus) {
+    var section = null;
+    STEPS.some(function (step) {
+      return step.sections.some(function (candidate) {
+        if (candidate.id === sectionId) { section = candidate; return true; }
+        return false;
+      });
+    });
+    if (!section) return;
+    var existing = null;
+    if (name) {
+      existing = state.items.filter(function (item) { return item.sectionId === sectionId && item.name === name; })[0];
+    }
+    if (existing) {
+      toast('「' + name + '」已经在里面了');
+      var existingName = document.querySelector('[data-item="' + existing.id + '"] .item-name');
+      if (existingName) existingName.focus();
+      return;
+    }
+    var item = makeItem(sectionId, name || '', cycle || 'month');
+    state.items.push(item);
+    saveState();
+    renderStep();
+    if (focus !== false) {
+      window.requestAnimationFrame(function () {
+        var row = document.querySelector('[data-item="' + item.id + '"]');
+        var input = row && row.querySelector(name ? '[data-field="amount"]' : '.item-name');
+        if (input) input.focus();
+      });
+    }
+  }
+
+  function removeItem(id) {
+    var item = state.items.filter(function (candidate) { return candidate.id === id; })[0];
+    if (!item) return;
+    state.items = state.items.filter(function (candidate) { return candidate.id !== id; });
+    saveState();
+    renderStep();
+    toast(item.name ? '已删除「' + item.name + '」' : '已删除一项');
+  }
+
+  function validateCurrentStep() {
+    var step = STEPS[state.step];
+    var invalid = itemsOfStep(step).filter(function (item) {
+      return amountOf(item) > 0 && !item.name.trim();
+    })[0];
+    if (!invalid) return true;
+    toast('有金额的项目还需要一个名称');
+    var input = document.querySelector('[data-item="' + invalid.id + '"] .item-name');
+    if (input) input.focus();
+    return false;
+  }
+
+  function goNext() {
+    if (!validateCurrentStep()) return;
+    if (state.step === STEPS.length - 1) {
+      saveState();
+      setScreen('review');
+      var title = document.getElementById('reviewTitle');
+      window.requestAnimationFrame(function () { title.focus({ preventScroll: true }); });
+      return;
+    }
+    state.step += 1;
+    saveState();
+    setScreen('wizard');
+    var heading = document.getElementById('questionTitle');
+    window.requestAnimationFrame(function () { heading.focus({ preventScroll: true }); });
+  }
+
+  function goBack() {
+    if (state.step === 0) {
+      setScreen('intro');
+      return;
+    }
+    state.step -= 1;
+    saveState();
+    setScreen('wizard');
+  }
+
+  function skipStep() {
+    var step = STEPS[state.step];
+    var hasAmounts = itemsOfStep(step).some(function (item) { return amountOf(item) > 0; });
+    if (hasAmounts && !window.confirm('这一页已经填了金额。清空本页并继续吗？')) return;
+    itemsOfStep(step).forEach(function (item) { item.amount = ''; });
+    saveState();
+    goNext();
+  }
+
+  function renderReview() {
+    var total = totals();
+    var reviewTotal = document.getElementById('reviewTotal');
+    reviewTotal.innerHTML = '' +
+      '<div class="rt-cell"><span>日均</span><strong>¥' + money(total.daily, 2) + '</strong></div>' +
+      '<div class="rt-cell"><span>每月</span><strong>¥' + money(total.monthly, 2) + '</strong></div>' +
+      '<div class="rt-cell"><span>每年</span><strong>¥' + money(total.yearly, 2) + '</strong></div>';
+
+    var list = document.getElementById('reviewList');
+    list.innerHTML = STEPS.map(function (step, index) {
+      var items = itemsOfStep(step).filter(function (item) { return monthlyOf(item) > 0; });
+      var monthly = stepMonthly(step);
+      var body = items.length ? items.map(function (item) {
+        return '<div class="review-item"><span>' + esc(item.name || '未命名项') + '<small>' + CYCLE_LABEL[item.cycle] + ' ' + money(amountOf(item), 2) + '</small></span><b>¥' + money(monthlyOf(item), 2) + '/月</b></div>';
+      }).join('') : '<p class="review-none">没有填写固定项</p>';
+      return '' +
+        '<section class="review-block">' +
+          '<div class="review-block-head"><div><h2>' + esc(step.name) + '</h2><p>' + (items.length ? items.length + ' 项 · 合计 ¥' + money(monthly, 2) + '/月' : '未填写') + '</p></div>' +
+            '<button type="button" class="review-edit" data-edit-step="' + index + '">修改</button>' +
+          '</div>' +
+          '<div class="review-items">' + body + '</div>' +
+        '</section>';
+    }).join('');
+    updateLive();
+  }
+
+  function categoryRows(total) {
+    return STEPS.map(function (step) {
+      var monthly = stepMonthly(step);
+      return { name: step.name, monthly: monthly };
+    }).filter(function (row) { return row.monthly > 0; }).sort(function (a, b) {
+      return b.monthly - a.monthly;
+    }).map(function (row) {
+      var daily = row.monthly * 12 / DAYS_PER_YEAR;
+      var percent = total.monthly > 0 ? (row.monthly / total.monthly) * 100 : 0;
+      return '' +
+        '<div class="cat-row">' +
+          '<div class="cat-line"><span class="cat-name"><i class="cat-dot" aria-hidden="true"></i><span>' + esc(row.name) + '</span></span><strong>¥' + money(daily, 2) + '<em>/天</em></strong></div>' +
+          '<div class="cat-bar" aria-hidden="true"><i style="width:' + Math.max(2, percent).toFixed(1) + '%"></i></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function topItem() {
+    return state.items.filter(function (item) { return monthlyOf(item) > 0; }).sort(function (a, b) {
+      return monthlyOf(b) - monthlyOf(a);
+    })[0] || null;
+  }
+
+  function renderResult() {
+    var total = totals();
+    var shell = document.getElementById('resultShell');
+    if (total.monthly <= 0) {
+      shell.innerHTML = '' +
+        '<div class="receipt"><div class="empty-result"><h2 id="resultTitle" tabindex="-1">这还是一张空白账单</h2><p>还没有可以计算的固定支出。返回上一页填几项，再来看你的日均成本。</p><button type="button" class="btn btn-primary" id="emptyBack">返回填写</button></div></div>';
+      document.getElementById('emptyBack').addEventListener('click', function () { setScreen('review'); });
+      updateLive();
+      return;
+    }
+
+    var top = topItem();
+    var topDaily = top ? dailyOf(top) : 0;
+    var date = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    var rows = categoryRows(total);
+    var per30 = total.monthly / 30;
+    shell.innerHTML = '' +
+      '<div class="result-heading"><h1 id="resultTitle" tabindex="-1">你的固定生活成本</h1><p>把每月固定项摊到全年，得到更稳定的日均数字。</p></div>' +
+      '<article class="receipt" aria-label="每日固定支出结果">' +
+        '<div class="receipt-top"><span class="receipt-brand">日摊</span><span>结算日 ' + esc(date) + '</span></div>' +
+        '<p class="receipt-label">每天固定要准备</p>' +
+        '<div class="daily-amount"><span class="cur">¥</span><strong>' + money(total.daily, 2) + '</strong><small>/ 天</small></div>' +
+        '<p class="daily-caption">按全年 365 天平均 · 不是今天实际已经花掉的钱</p>' +
+        '<hr class="receipt-rule" />' +
+        '<div class="receipt-summary">' +
+          '<div class="summary-cell"><span>每月平均</span><strong>¥' + money(total.monthly, 2) + '</strong></div>' +
+          '<div class="summary-cell"><span>每年固定支出</span><strong>¥' + money(total.yearly, 2) + '</strong></div>' +
+        '</div>' +
+        '<p class="breakdown-title">按类别摊到每天</p>' +
+        '<div class="breakdown">' + rows + '</div>' +
+        '<div class="receipt-note"><p>' + (top ? '最大的一项是「' + esc(top.name || '未命名项') + '」，每天约 ¥' + money(topDaily, 2) + '。' : '') + '按 30 天月份计算，日均约 ¥' + money(per30, 2) + '；具体月份会因天数略有变化。</p><div class="stamp">固定<br />开支</div></div>' +
+      '</article>' +
+      '<div class="result-actions">' +
+        '<button type="button" class="btn" id="resultAdjust">返回明细</button>' +
+        '<button type="button" class="btn" id="copyResult">复制明细</button>' +
+        '<button type="button" class="btn btn-primary btn-lg" id="resultRestart">从头再算一次</button>' +
+      '</div>' +
+      '<p class="scope-footnote">只包含你确认过的固定支出。吃饭、通勤、临时消费和其他按活动产生的费用均未计入。</p>';
+
+    document.getElementById('resultAdjust').addEventListener('click', function () { setScreen('review'); });
+    document.getElementById('copyResult').addEventListener('click', copyResult);
+    document.getElementById('resultRestart').addEventListener('click', function () {
+      if (window.confirm('这会清空当前填写内容，从头开始。确定吗？')) startFresh();
+    });
+    updateLive();
+  }
+
+  function plainSummary() {
+    var total = totals();
+    var lines = ['日摊 · 每日固定开支', '日均：¥' + money(total.daily, 2), '每月：¥' + money(total.monthly, 2), '每年：¥' + money(total.yearly, 2), ''];
+    STEPS.forEach(function (step) {
+      var monthly = stepMonthly(step);
+      if (monthly > 0) lines.push(step.name + '：¥' + money(monthly, 2) + '/月');
+    });
+    lines.push('', '不含吃饭、通勤、临时消费及其他浮动支出。');
+    return lines.join('\n');
+  }
+
+  function copyResult() {
+    var text = plainSummary();
+    function fallbackCopy() {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      var copied = false;
+      try { copied = document.execCommand('copy'); } catch (error) { copied = false; }
+      document.body.removeChild(area);
+      toast(copied ? '明细已复制' : '复制失败，请长按页面内容复制');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { toast('明细已复制'); }, fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+  }
+
+  function startFresh() {
+    state = freshState();
+    saveState();
+    setScreen('wizard');
+    window.requestAnimationFrame(function () {
+      var title = document.getElementById('questionTitle');
+      title.focus({ preventScroll: true });
+    });
+  }
+
+  function resumeSaved() {
+    setScreen('wizard');
+    window.requestAnimationFrame(function () {
+      var title = document.getElementById('questionTitle');
+      title.focus({ preventScroll: true });
+    });
+  }
+
+  document.getElementById('startBtn').addEventListener('click', function () {
+    if (hasSavedProgress()) resumeSaved(); else startFresh();
+  });
+
+  document.getElementById('restartIntro').addEventListener('click', function () {
+    if (window.confirm('这会清空当前填写内容，从头开始。确定吗？')) startFresh();
+  });
+
+  document.getElementById('brandHome').addEventListener('click', function () {
+    setScreen('intro');
+  });
+
+  document.getElementById('backBtn').addEventListener('click', goBack);
+  document.getElementById('nextBtn').addEventListener('click', goNext);
+  document.getElementById('skipBtn').addEventListener('click', skipStep);
+  document.getElementById('reviewBackBtn').addEventListener('click', function () { setScreen('wizard'); });
+  document.getElementById('makeResultBtn').addEventListener('click', function () {
+    saveState();
+    setScreen('result');
+    var resultTitle = document.getElementById('resultTitle');
+    if (resultTitle) window.requestAnimationFrame(function () { resultTitle.focus({ preventScroll: true }); });
+  });
+
+  document.getElementById('stepBody').addEventListener('input', function (event) {
+    var target = event.target;
+    var row = target.closest('[data-item]');
+    if (!row) return;
+    var item = state.items.filter(function (candidate) { return candidate.id === row.getAttribute('data-item'); })[0];
+    if (!item) return;
+    if (target.matches('[data-field="name"]')) item.name = target.value;
+    if (target.matches('[data-field="amount"]')) item.amount = target.value;
+    if (target.matches('[data-field="amount"]')) {
+      var eq = row.querySelector('[data-eq]');
+      if (eq) eq.textContent = item.amount === '' ? '未填写' : '约 ¥' + money(monthlyOf(item), 2) + '/月';
+    }
+    saveState();
+    updateLive();
+  });
+
+  document.getElementById('stepBody').addEventListener('change', function (event) {
+    var target = event.target;
+    if (!target.matches('[data-field="cycle"]')) return;
+    var row = target.closest('[data-item]');
+    var item = state.items.filter(function (candidate) { return candidate.id === row.getAttribute('data-item'); })[0];
+    if (!item) return;
+    item.cycle = target.value;
+    var eq = row.querySelector('[data-eq]');
+    if (eq) eq.textContent = item.amount === '' ? '未填写' : '约 ¥' + money(monthlyOf(item), 2) + '/月';
+    saveState();
+    updateLive();
+  });
+
+  document.getElementById('stepBody').addEventListener('click', function (event) {
+    var add = event.target.closest('[data-add-section]');
+    if (add) {
+      addItem(add.getAttribute('data-add-section'), '', 'month', true);
+      return;
+    }
+    var quick = event.target.closest('[data-quick-section]');
+    if (quick) {
+      addItem(quick.getAttribute('data-quick-section'), quick.getAttribute('data-quick-name'), quick.getAttribute('data-quick-cycle'), true);
+      return;
+    }
+    var remove = event.target.closest('[data-remove]');
+    if (remove) removeItem(remove.getAttribute('data-remove'));
+  });
+
+  document.getElementById('reviewList').addEventListener('click', function (event) {
+    var edit = event.target.closest('[data-edit-step]');
+    if (!edit) return;
+    state.step = Number(edit.getAttribute('data-edit-step')) || 0;
+    saveState();
+    setScreen('wizard');
+  });
+
+  refreshIntro();
+  updateLive();
+})();
+</script>
+</body>
+</html>
