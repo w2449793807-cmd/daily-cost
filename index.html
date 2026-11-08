@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>日摊 · 每天固定要花多少</title>
-<meta name="description" content="用问答的方式梳理房租、会员、保险等固定支出，把每月固定成本摊到每一天。数据只保存在本机。" />
+<title>日摊｜算算每天固定要花多少</title>
+<meta name="description" content="把房租、账单、会员、保险这些固定支出过一遍，算出每天大概要预留多少钱。只在本机计算。" />
 <meta name="theme-color" content="#2f5f8a" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#101721" media="(prefers-color-scheme: dark)" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,8 +12,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="日摊" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="日摊 · 每天固定要花多少" />
-<meta property="og:description" content="用问答梳理固定支出，把每月的房租、会员、保险摊到每一天。数据只留在本机。" />
+<meta property="og:title" content="日摊｜算算每天固定要花多少" />
+<meta property="og:description" content="房租、账单、会员、保险，摊到每天大概是多少？只算固定项，数据留在本机。" />
 <meta property="og:url" content="https://daily.saikende.cn/" />
 <meta name="format-detection" content="telephone=no" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%232f5f8a'/%3E%3Ctext x='32' y='42' font-size='30' font-family='serif' font-weight='700' fill='%23fffdf7' text-anchor='middle'%3E日%3C/text%3E%3C/svg%3E" />
@@ -434,14 +434,14 @@
 
           <div class="intro-grid">
             <div class="intro-copy">
-              <p class="intro-kicker">把跑不掉的钱，摊到每一天</p>
+              <p class="intro-kicker">先把固定成本看清楚</p>
               <h1 id="introTitle" tabindex="-1"><span>每天睁眼，</span><span>已经花掉多少？</span></h1>
-              <p class="intro-lead">用几组简单问题，把房租、会员、保险这些固定支出梳理出来。不追踪流水，只确认你每天必须准备好的那笔钱。</p>
+              <p class="intro-lead">按住处、账单、会员、保险这些固定项目过一遍，算出每天大概要预留多少钱。只算固定项，不追每一笔消费。</p>
               <div class="intro-actions">
-                <button type="button" class="btn btn-primary btn-lg" id="startBtn">开始梳理</button>
+                <button type="button" class="btn btn-primary btn-lg" id="startBtn">开始算</button>
                 <button type="button" class="btn btn-text" id="restartIntro" hidden>重新开始</button>
               </div>
-              <p class="intro-meta"><span>6 组问题</span><span>约 3 分钟</span><span>自动保存</span></p>
+              <p class="intro-meta"><span>6 组问题</span><span>大约 3 分钟</span><span>自动保存</span></p>
               <p class="intro-meta" id="savedNote" hidden></p>
               <div class="scope-note" aria-label="不计入的项目">
                 <span>吃饭</span><span>通勤</span><span>临时消费</span>
@@ -459,15 +459,15 @@
                 <div class="rp-line"><span>保障</span><i></i><b>04</b></div>
               </div>
               <div class="rp-foot">
-                <p class="rp-note">把每月固定项统一折算，得到全年平均的每日成本。</p>
+                <p class="rp-note">把每月固定项摊到全年，得到更稳定的每日成本。</p>
                 <div class="stamp">固定<br />开支</div>
               </div>
             </div>
           </div>
 
           <div class="intro-foot">
-            <p>只会保存在当前浏览器的本地存储里，不会上传。</p>
-            <p>只为看清固定成本，不作为记账或理财建议。</p>
+            <p>数据只留在这个浏览器里，不会上传。</p>
+            <p>它帮你看清钱花在哪儿，不能替代记账和理财建议。</p>
           </div>
         </div>
       </section>
@@ -498,7 +498,7 @@
         <div class="review-shell">
           <div class="review-head">
             <h1 id="reviewTitle" tabindex="-1">最后核对一下</h1>
-            <p>周期不同也没关系，下面已经统一折算成每月金额。点任意一组可以返回修改。</p>
+            <p>周期不一样也没关系，下面都按每月金额来算。点任意一组可以回去改。</p>
           </div>
           <div class="review-total" id="reviewTotal"></div>
           <div class="review-list" id="reviewList"></div>
@@ -532,8 +532,8 @@
       id: 'home',
       name: '住处',
       kicker: '住处',
-      title: '先说说，你为住处固定付多少？',
-      description: '房租通常是大头。只填每月都会发生的固定项，不含按用量浮动的水电。按年或按季付就切换周期。',
+      title: '住处每月固定要花多少？',
+      description: '房租、房贷、物业和固定停车费都算。只填每月都会发生的项目，水电这种按用量变的留到下一页。',
       sections: [{
         id: 'housing',
         title: '居住固定项',
@@ -547,8 +547,8 @@
       id: 'bills',
       name: '账单',
       kicker: '基础账单',
-      title: '每月账单，大概是多少？',
-      description: '水电网会浮动，填最近几个月的平均数就好。宽带如果只承担一部分，也填你实际支付的那部分。',
+      title: '水电和话费，每月大概多少？',
+      description: '按最近几个月的平均数填就行。宽带、手机套餐如果和别人分摊，只填你自己付的那部分。',
       sections: [{
         id: 'utilities',
         title: '水电与通信',
@@ -562,8 +562,8 @@
       id: 'subscriptions',
       name: '会员',
       kicker: '会员与订阅',
-      title: '有哪些固定续费，或者一次买一年的会员？',
-      description: '合订包写成一项就好，比如「B站 + 酷狗」。到期才续、但每年都会发生的，也按年填入。',
+      title: '有哪些每月自动续费，或者一年买一次？',
+      description: '视频、音乐、云盘、软件订阅都放这里。合订包写成一项，比如「B站 + 酷狗」。',
       sections: [{
         id: 'subscriptions',
         title: '会员与订阅',
@@ -582,8 +582,8 @@
       id: 'protection',
       name: '保障',
       kicker: '保障与还款',
-      title: '有没有固定保险，或每月必须还的钱？',
-      description: '医疗险、重疾险、固定分期和贷款月供，都会占住每月现金流。日常刷卡的浮动消费不填。',
+      title: '保险和固定还款，每月要留多少？',
+      description: '医疗险、重疾险、分期和贷款月供，都会提前占住一笔钱。日常刷卡这种不固定的消费不用填。',
       sections: [
         {
           id: 'insurance', title: '保险', note: '按实际缴费周期', addLabel: '添加保险',
@@ -599,8 +599,8 @@
       id: 'care',
       name: '健康与宠物',
       kicker: '健康与宠物',
-      title: '身体和宠物，有没有固定要花的钱？',
-      description: '健身卡、固定药费、猫粮猫砂都算。按实际缴费周期填，不需要估算临时看病的钱。',
+      title: '身体和宠物，有哪些固定开销？',
+      description: '健身卡、固定药费、猫粮猫砂都算。按实际缴费周期填，临时看病这类不确定的花费先不算。',
       sections: [
         {
           id: 'health', title: '健康与运动', note: '固定才填', addLabel: '添加健康支出',
@@ -616,8 +616,8 @@
       id: 'extras',
       name: '工作与其他',
       kicker: '工作、家人与其他',
-      title: '最后，还有哪些固定项？',
-      description: '工作学习工具、家庭支持、年费、捐赠或其他合同支出。没有的组直接留空。',
+      title: '还有哪些固定支出？',
+      description: '工作工具、课程、家用、年费和固定捐赠都可以放这里。没有就留空。',
       sections: [
         {
           id: 'work', title: '工作与学习', note: '只看固定项', addLabel: '添加工作支出',
@@ -779,12 +779,12 @@
     var restart = document.getElementById('restartIntro');
     var savedNote = document.getElementById('savedNote');
     if (hasSavedProgress()) {
-      startBtn.textContent = '继续上次';
+      startBtn.textContent = '接着上次';
       restart.hidden = false;
       savedNote.hidden = false;
       savedNote.textContent = '上次停在：' + STEPS[state.step].name;
     } else {
-      startBtn.textContent = '开始梳理';
+      startBtn.textContent = '开始算';
       restart.hidden = true;
       savedNote.hidden = true;
     }
@@ -848,7 +848,7 @@
     document.getElementById('progressFill').style.width = (((state.step + 1) / STEPS.length) * 100) + '%';
     document.getElementById('stepBody').innerHTML = step.sections.map(renderSection).join('');
     document.getElementById('backBtn').textContent = state.step === 0 ? '返回首页' : '上一步';
-    document.getElementById('nextBtn').textContent = state.step === STEPS.length - 1 ? '核对明细' : '继续';
+    document.getElementById('nextBtn').textContent = state.step === STEPS.length - 1 ? '核对一下' : '继续';
     updateLive();
   }
 
@@ -934,7 +934,7 @@
   function skipStep() {
     var step = STEPS[state.step];
     var hasAmounts = itemsOfStep(step).some(function (item) { return amountOf(item) > 0; });
-    if (hasAmounts && !window.confirm('这一页已经填了金额。清空本页并继续吗？')) return;
+    if (hasAmounts && !window.confirm('这一页已经填了金额，要清空后再跳过吗？')) return;
     itemsOfStep(step).forEach(function (item) { item.amount = ''; });
     saveState();
     goNext();
@@ -954,7 +954,7 @@
       var monthly = stepMonthly(step);
       var body = items.length ? items.map(function (item) {
         return '<div class="review-item"><span>' + esc(item.name || '未命名项') + '<small>' + CYCLE_LABEL[item.cycle] + ' ' + money(amountOf(item), 2) + '</small></span><b>¥' + money(monthlyOf(item), 2) + '/月</b></div>';
-      }).join('') : '<p class="review-none">没有填写固定项</p>';
+      }).join('') : '<p class="review-none">这项先空着</p>';
       return '' +
         '<section class="review-block">' +
           '<div class="review-block-head"><div><h2>' + esc(step.name) + '</h2><p>' + (items.length ? items.length + ' 项 · 合计 ¥' + money(monthly, 2) + '/月' : '未填写') + '</p></div>' +
@@ -994,7 +994,7 @@
     var shell = document.getElementById('resultShell');
     if (total.monthly <= 0) {
       shell.innerHTML = '' +
-        '<div class="receipt"><div class="empty-result"><h2 id="resultTitle" tabindex="-1">这还是一张空白账单</h2><p>还没有可以计算的固定支出。返回上一页填几项，再来看你的日均成本。</p><button type="button" class="btn btn-primary" id="emptyBack">返回填写</button></div></div>';
+        '<div class="receipt"><div class="empty-result"><h2 id="resultTitle" tabindex="-1">还没有能算的数字</h2><p>回去填几项固定支出，再来看每天大概要预留多少。</p><button type="button" class="btn btn-primary" id="emptyBack">返回填写</button></div></div>';
       document.getElementById('emptyBack').addEventListener('click', function () { setScreen('review'); });
       updateLive();
       return;
@@ -1006,10 +1006,10 @@
     var rows = categoryRows(total);
     var per30 = total.monthly / 30;
     shell.innerHTML = '' +
-      '<div class="result-heading"><h1 id="resultTitle" tabindex="-1">你的固定生活成本</h1><p>把每月固定项摊到全年，得到更稳定的日均数字。</p></div>' +
+      '<div class="result-heading"><h1 id="resultTitle" tabindex="-1">你每天大概要预留多少</h1><p>按全年平均来算，月份长短带来的差别会被摊平。</p></div>' +
       '<article class="receipt" aria-label="每日固定支出结果">' +
         '<div class="receipt-top"><span class="receipt-brand">日摊</span><span>结算日 ' + esc(date) + '</span></div>' +
-        '<p class="receipt-label">每天固定要准备</p>' +
+        '<p class="receipt-label">每天固定要预留</p>' +
         '<div class="daily-amount"><span class="cur">¥</span><strong>' + money(total.daily, 2) + '</strong><small>/ 天</small></div>' +
         '<p class="daily-caption">按全年 365 天平均 · 不是今天实际已经花掉的钱</p>' +
         '<hr class="receipt-rule" />' +
